@@ -50,10 +50,10 @@ function showConfirmation(message, onConfirm, onCancel) {
             <div style="background: white; border-radius: 0.5rem; padding: 1.5rem; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); z-index: 9999;">
                 <p style="font-size: 1rem; color: #1f2937; margin-bottom: 1.5rem; font-weight: 500;">${message}</p>
                 <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
-                    <button onclick="document.getElementById('customConfirmModal').style.display='none'; (${onCancel.toString()})()" style="background-color: #d1d5db; color: #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+                    <button id="confirmCancelBtn" style="background-color: #d1d5db; color: #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
                         Cancel
                     </button>
-                    <button onclick="document.getElementById('customConfirmModal').style.display='none'; (${onConfirm.toString()})()" style="background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+                    <button id="confirmDeleteBtn" style="background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
                         Delete
                     </button>
                 </div>
@@ -61,6 +61,20 @@ function showConfirmation(message, onConfirm, onCancel) {
         </div>
     `;
     confirmModal.style.display = 'flex';
+    
+    // Add event listeners to buttons
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    cancelBtn.addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+        if (onCancel) onCancel();
+    });
+    
+    deleteBtn.addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+        if (onConfirm) onConfirm();
+    });
 }
 
 // Fetch items from API
