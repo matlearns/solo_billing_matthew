@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Billing - Sales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">Solo Billing</h1>
+                <ul class="flex gap-6">
+                    <li><a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium">Home</a></li>
+                    <li><a href="dashboard.html" class="text-gray-600 hover:text-blue-600 font-medium">Dashboard</a></li>
+                    <li><a href="items.html" class="text-gray-600 hover:text-blue-600 font-medium">Items</a></li>
+                    <li><a href="sales.html" class="text-gray-600 hover:text-blue-600 font-medium">Sales</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Sales Records Section -->
+        <section id="sales">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Sales Records</h2>
+                <a href="sales.html?new=true" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                    + New Order
+                </a>
+            </div>
+
+            <!-- New Order Form (Hidden by default, shown when ?new=true) -->
+            <div id="orderFormSection" class="bg-white rounded-lg shadow-md p-6 mb-6" style="display: none;">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Create New Order</h3>
+                <form id="orderForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Customer Name</label>
+                            <input type="text" id="orderCustomerName" placeholder="Enter customer name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Item Selection -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Add Items</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Select Item</label>
+                                <select id="itemSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                                    <option value="">Choose an item...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Quantity</label>
+                                <input type="number" id="itemQty" placeholder="1" min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Unit Price</label>
+                                <input type="number" id="itemPrice" placeholder="0.00" step="0.01" disabled class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Total</label>
+                                <input type="number" id="itemTotal" placeholder="0.00" step="0.01" disabled class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100">
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" id="addItemBtn" onclick="addItemToOrder()" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                                    Add Item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items Table -->
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold text-gray-700 mb-3">Order Items</h4>
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-3 py-2 text-left">Item</th>
+                                    <th class="px-3 py-2 text-left">Price</th>
+                                    <th class="px-3 py-2 text-left">Qty</th>
+                                    <th class="px-3 py-2 text-left">Total</th>
+                                    <th class="px-3 py-2 text-left">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsBody">
+                                <tr class="border-b">
+                                    <td colspan="5" class="px-3 py-4 text-center text-gray-500">No items added</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Totals -->
+                    <div class="border-t pt-4 flex justify-end">
+                        <div class="w-full md:w-64">
+                            <div class="flex justify-between mb-2 text-gray-700">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">$0.00</span>
+                            </div>
+                            <div class="flex justify-between mb-3 text-gray-700">
+                                <span>Discount:</span>
+                                <input type="number" id="discountAmount" placeholder="0.00" step="0.01" value="0" class="w-24 px-2 py-1 border border-gray-300 rounded text-right">
+                            </div>
+                            <div class="flex justify-between text-lg font-semibold text-blue-600 border-t pt-2">
+                                <span>Grand Total:</span>
+                                <span id="grandTotal">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                            Create Order
+                        </button>
+                        <button type="reset" class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-medium">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sales Table -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Order ID</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Customer Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Items</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Amount</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Discount</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Grand Total</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody">
+                        <tr class="border-b hover:bg-gray-50">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- View Order Modal -->
+    <div id="viewOrderModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Order Details</h3>
+            <div id="viewOrderContent" class="mb-6">
+                <!-- Order details will be populated here -->
+            </div>
+            <div class="flex justify-end">
+                <button type="button" onclick="closeViewOrderModal()" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 font-medium">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2026 Solo Billing. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="web_app.js"></script>
+    <script>
+        // Load sales on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSales();
+            setupItemSelectListener();
+            setupOrderForm();
+            
+            // Check URL parameters
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('new') === 'true') {
+                document.getElementById('orderFormSection').style.display = 'block';
+            }
+            if (params.get('view')) {
+                const viewId = params.get('view');
+                viewOrder(parseInt(viewId));
+            }
+        });
+
+        // Setup order form
+        function setupOrderForm() {
+            const orderForm = document.getElementById('orderForm');
+            if (orderForm) {
+                orderForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const customerName = document.getElementById('orderCustomerName').value;
+                    const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
+                    const grandTotal = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '')) || 0;
+                    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '')) || 0;
+                    
+                    if (!customerName) {
+                        alert('Please enter customer name');
+                        return;
+                    }
+                    
+                    if (orderItems.length === 0) {
+                        alert('Please add at least one item to the order');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/orders', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                customer_name: customerName,
+                                items: orderItems,
+                                total_amount: subtotal,
+                                discount: discount,
+                                grand_total: grandTotal
+                            })
+                        });
+                        
+                        const responseData = await response.json();
+                        
+                        if (response.ok) {
+                            alert('Order created successfully!');
+                            orderForm.reset();
+                            orderItems = [];
+                            displayOrderItems();
+                            updateOrderTotals();
+                            document.getElementById('orderFormSection').style.display = 'none';
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            await loadSales();
+                        } else {
+                            alert('Error: ' + (responseData.error || 'Failed to create order'));
+                        }
+                    } catch (error) {
+                        console.error('Error creating order:', error);
+                        alert('Error creating order: ' + error.message);
+                    }
+                });
+            }
+        }
+
+        // Override displaySales for this page
+        function displaySales(sales) {
+            const tbody = document.getElementById('salesTableBody');
+            
+            if (!tbody) {
+                console.error('Could not find sales tbody element');
+                return;
+            }
+            
+            if (!Array.isArray(sales) || sales.length === 0) {
+                tbody.innerHTML = '<tr class="border-b hover:bg-gray-50"><td colspan="7" class="px-6 py-4 text-center text-gray-500">No orders found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = sales.map(sale => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-700">${sale.selling_id}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${sale.customer_name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${sale.items_count || 0}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">$${parseFloat(sale.total_amount).toFixed(2)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">$${parseFloat(sale.discount).toFixed(2)}</td>
+                    <td class="px-6 py-4 text-sm font-semibold text-blue-600">$${parseFloat(sale.grand_total).toFixed(2)}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <button type="button" class="text-blue-600 hover:text-blue-800 mr-3" onclick="viewOrder(${sale.selling_id})">View</button>
+                        <button type="button" class="text-red-600 hover:text-red-800" onclick="deleteSale(${sale.selling_id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

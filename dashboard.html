@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Billing - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">Solo Billing</h1>
+                <ul class="flex gap-6">
+                    <li><a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium">Home</a></li>
+                    <li><a href="dashboard.html" class="text-gray-600 hover:text-blue-600 font-medium">Dashboard</a></li>
+                    <li><a href="items.html" class="text-gray-600 hover:text-blue-600 font-medium">Items</a></li>
+                    <li><a href="sales.html" class="text-gray-600 hover:text-blue-600 font-medium">Sales</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Total Items</p>
+                    <p class="text-3xl font-bold text-blue-600" id="totalItems">0</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Total Sales</p>
+                    <p class="text-3xl font-bold text-green-600" id="totalSales">$0.00</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Recent Orders</p>
+                    <p class="text-3xl font-bold text-purple-600" id="totalOrders">0</p>
+                </div>
+            </div>
+
+            <!-- Recent Orders Table -->
+            <div class="bg-white rounded-lg shadow-md mt-8 overflow-hidden">
+                <h3 class="text-xl font-semibold text-gray-800 p-6 border-b">Recent Orders</h3>
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Order ID</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Customer</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Items</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Amount</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersBody">
+                        <tr class="border-b hover:bg-gray-50">
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2026 Solo Billing. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="web_app.js"></script>
+    <script>
+        // Load dashboard data
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Load items count
+                const itemsResponse = await fetch('/api/items');
+                const items = await itemsResponse.json();
+                document.getElementById('totalItems').textContent = items.length || 0;
+
+                // Load sales data
+                const salesResponse = await fetch('/api/sales');
+                const sales = await salesResponse.json();
+                
+                // Calculate total sales and orders
+                let totalSales = 0;
+                sales.forEach(sale => {
+                    totalSales += parseFloat(sale.grand_total) || 0;
+                });
+                
+                document.getElementById('totalSales').textContent = '$' + totalSales.toFixed(2);
+                document.getElementById('totalOrders').textContent = sales.length || 0;
+
+                // Display recent orders (limit to 5)
+                const recentOrders = sales.slice(0, 5);
+                const tbody = document.getElementById('recentOrdersBody');
+                
+                if (recentOrders.length === 0) {
+                    tbody.innerHTML = '<tr class="border-b hover:bg-gray-50"><td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found</td></tr>';
+                } else {
+                    tbody.innerHTML = recentOrders.map(order => `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm text-gray-700">${order.selling_id}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${order.customer_name}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${order.items_count || 0}</td>
+                            <td class="px-6 py-4 text-sm font-semibold text-blue-600">$${parseFloat(order.grand_total).toFixed(2)}</td>
+                            <td class="px-6 py-4 text-sm">
+                                <button type="button" class="text-blue-600 hover:text-blue-800" onclick="viewOrderFromDashboard(${order.selling_id})">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        });
+
+        function viewOrderFromDashboard(sellingId) {
+            // Redirect to sales page and show order details
+            window.location.href = `sales.html?view=${sellingId}`;
+        }
+    </script>
+</body>
+</html>

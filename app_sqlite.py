@@ -63,10 +63,22 @@ def init_db():
         conn.close()
         print("Database initialized successfully!")
 
-# Serve main page
+# Serve main pages
 @app.route('/')
 def index():
-    return render_template('web_index.html')
+    return render_template('index.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/items')
+def items():
+    return render_template('items.html')
+
+@app.route('/sales')
+def sales():
+    return render_template('sales.html')
 
 # Serve static files
 @app.route('/<path:filename>')

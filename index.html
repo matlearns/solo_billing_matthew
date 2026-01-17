@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Billing - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">Solo Billing</h1>
+                <ul class="flex gap-6">
+                    <li><a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium">Home</a></li>
+                    <li><a href="dashboard.html" class="text-gray-600 hover:text-blue-600 font-medium">Dashboard</a></li>
+                    <li><a href="items.html" class="text-gray-600 hover:text-blue-600 font-medium">Items</a></li>
+                    <li><a href="sales.html" class="text-gray-600 hover:text-blue-600 font-medium">Sales</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Solo Billing</h2>
+            <p class="text-xl text-gray-600 mb-8">Manage your items, create orders, and track sales with ease.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <!-- Dashboard Card -->
+                <div class="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
+                    <div class="text-4xl text-blue-600 mb-4">📊</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Dashboard</h3>
+                    <p class="text-gray-600 mb-4">View your business overview and statistics</p>
+                    <a href="dashboard.html" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                        Go to Dashboard
+                    </a>
+                </div>
+
+                <!-- Items Card -->
+                <div class="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
+                    <div class="text-4xl text-green-600 mb-4">📦</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Items</h3>
+                    <p class="text-gray-600 mb-4">Manage your products and inventory</p>
+                    <a href="items.html" class="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium">
+                        Go to Items
+                    </a>
+                </div>
+
+                <!-- Sales Card -->
+                <div class="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
+                    <div class="text-4xl text-purple-600 mb-4">💰</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Sales</h3>
+                    <p class="text-gray-600 mb-4">Create orders and view sales records</p>
+                    <a href="sales.html" class="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 font-medium">
+                        Go to Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2026 Solo Billing. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
