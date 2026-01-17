@@ -202,12 +202,12 @@
                     const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '')) || 0;
                     
                     if (!customerName) {
-                        alert('Please enter customer name');
+                        showNotification('Please enter customer name', 'warning');
                         return;
                     }
                     
                     if (orderItems.length === 0) {
-                        alert('Please add at least one item to the order');
+                        showNotification('Please add at least one item to the order', 'warning');
                         return;
                     }
                     
@@ -227,7 +227,7 @@
                         const responseData = await response.json();
                         
                         if (response.ok) {
-                            alert('Order created successfully!');
+                            showNotification('Order created successfully!', 'success');
                             orderForm.reset();
                             orderItems = [];
                             displayOrderItems();
@@ -236,11 +236,11 @@
                             window.history.replaceState({}, document.title, window.location.pathname);
                             await loadSales();
                         } else {
-                            alert('Error: ' + (responseData.error || 'Failed to create order'));
+                            showNotification('Error: ' + (responseData.error || 'Failed to create order'), 'error');
                         }
                     } catch (error) {
                         console.error('Error creating order:', error);
-                        alert('Error creating order: ' + error.message);
+                        showNotification('Error creating order: ' + error.message, 'error');
                     }
                 });
             }

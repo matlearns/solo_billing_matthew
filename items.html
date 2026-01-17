@@ -147,15 +147,15 @@
                         const responseData = await response.json();
                         
                         if (response.ok) {
-                            alert('Item added successfully!');
+                            showNotification('Item added successfully!', 'success');
                             form.reset();
                             await loadItems();
                         } else {
-                            alert('Error: ' + (responseData.error || 'Failed to add item'));
+                            showNotification('Error: ' + (responseData.error || 'Failed to add item'), 'error');
                         }
                     } catch (error) {
                         console.error('Error adding item:', error);
-                        alert('Error adding item: ' + error.message);
+                        showNotification('Error adding item: ' + error.message, 'error');
                     }
                 });
             }
