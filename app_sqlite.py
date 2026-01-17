@@ -122,6 +122,50 @@ def add_item():
         print(f"Error in add_item: {e}", file=sys.stderr)
         return jsonify({'error': str(e)}), 500
 
+# API: Update item
+@app.route('/api/items/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+    try:
+        data = request.json
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        cur.execute(
+            'UPDATE item_record SET item_name = ?, cost_price = ?, sell_price = ? WHERE item_id = ?',
+            (data['item_name'], data['cost_price'], data['sell_price'], item_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        print(f"Item {item_id} updated successfully", file=sys.stderr)
+        return jsonify({'message': 'Item updated successfully'}), 200
+    except Exception as e:
+        print(f"Error in update_item: {e}", file=sys.stderr)
+        return jsonify({'error': str(e)}), 500
+
+# API: Delete item
+@app.route('/api/items/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        cur.execute('DELETE FROM item_record WHERE item_id = ?', (item_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        print(f"Item {item_id} deleted successfully", file=sys.stderr)
+        return jsonify({'message': 'Item deleted successfully'}), 200
+    except Exception as e:
+        print(f"Error in delete_item: {e}", file=sys.stderr)
+        return jsonify({'error': str(e)}), 500
+
 # API: Get all sales
 @app.route('/api/sales', methods=['GET'])
 def get_sales():
@@ -169,6 +213,109 @@ def add_sale():
         return jsonify({'selling_id': selling_id, 'message': 'Order created successfully'}), 201
     except Exception as e:
         print(f"Error in add_sale: {e}", file=sys.stderr)
+        return jsonify({'error': str(e)}), 500
+
+# API: Create new order with multiple items
+@app.route('/api/orders', methods=['POST'])
+def create_order():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        # Validate input
+        if not data.get('customer_name') or not data.get('items'):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        cur = conn.cursor()
+        
+        # Create selling record
+        cur.execute(
+            'INSERT INTO selling_record (customer_id, customer_name, total_amount, discount, grand_total) VALUES (?, ?, ?, ?, ?)',
+            (1, data['customer_name'], data['total_amount'], data['discount'], data['grand_total'])
+        )
+        conn.commit()
+        selling_id = cur.lastrowid
+        
+        # Insert items into selling_details
+        for item in data['items']:
+            cur.execute(
+                'INSERT INTO selling_details (selling_id, item_id, quantity) VALUES (?, ?, ?)',
+                (selling_id, item['id'], item['qty'])
+            )
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        print(f"Order {selling_id} created successfully", file=sys.stderr)
+        return jsonify({'selling_id': selling_id, 'message': 'Order created successfully'}), 201
+    except Exception as e:
+        print(f"Error in create_order: {e}", file=sys.stderr)
+        return jsonify({'error': str(e)}), 500
+
+# API: Delete sale/order
+@app.route('/api/sales/<int:selling_id>', methods=['DELETE'])
+def delete_sale(selling_id):
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        
+        # Delete selling_details entries first (foreign key constraint)
+        cur.execute('DELETE FROM selling_details WHERE selling_id = ?', (selling_id,))
+        
+        # Delete selling_record
+        cur.execute('DELETE FROM selling_record WHERE selling_id = ?', (selling_id,))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        print(f"Order {selling_id} deleted successfully", file=sys.stderr)
+        return jsonify({'message': 'Order deleted successfully'}), 200
+    except Exception as e:
+        print(f"Error in delete_sale: {e}", file=sys.stderr)
+        return jsonify({'error': str(e)}), 500
+
+# API: Get order details with items
+@app.route('/api/sales/<int:selling_id>/details', methods=['GET'])
+def get_order_details(selling_id):
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return jsonify({'error': 'Database connection failed'}), 500
+        
+        cur = conn.cursor()
+        
+        # Get selling record
+        cur.execute('SELECT * FROM selling_record WHERE selling_id = ?', (selling_id,))
+        order = cur.fetchone()
+        
+        if not order:
+            return jsonify({'error': 'Order not found'}), 404
+        
+        # Get selling details with item names and prices
+        cur.execute('''
+            SELECT sd.*, ir.item_name, ir.sell_price
+            FROM selling_details sd
+            LEFT JOIN item_record ir ON sd.item_id = ir.item_id
+            WHERE sd.selling_id = ?
+        ''', (selling_id,))
+        items = cur.fetchall()
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'order': dict(order),
+            'items': [dict(item) for item in items]
+        })
+    except Exception as e:
+        print(f"Error in get_order_details: {e}", file=sys.stderr)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
