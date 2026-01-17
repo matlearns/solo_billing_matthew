@@ -35,6 +35,34 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
+// Custom confirmation dialog
+function showConfirmation(message, onConfirm, onCancel) {
+    // Create modal container
+    let confirmModal = document.getElementById('customConfirmModal');
+    if (!confirmModal) {
+        confirmModal = document.createElement('div');
+        confirmModal.id = 'customConfirmModal';
+        document.body.appendChild(confirmModal);
+    }
+
+    confirmModal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9998; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; border-radius: 0.5rem; padding: 1.5rem; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); z-index: 9999;">
+                <p style="font-size: 1rem; color: #1f2937; margin-bottom: 1.5rem; font-weight: 500;">${message}</p>
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button onclick="document.getElementById('customConfirmModal').style.display='none'; (${onCancel.toString()})()" style="background-color: #d1d5db; color: #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+                        Cancel
+                    </button>
+                    <button onclick="document.getElementById('customConfirmModal').style.display='none'; (${onConfirm.toString()})()" style="background-color: #ef4444; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; cursor: pointer; font-weight: 500; transition: background-color 0.2s;">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    confirmModal.style.display = 'flex';
+}
+
 // Fetch items from API
 async function loadItems() {
     try {
@@ -276,27 +304,25 @@ function displaySales(sales) {
 
 // Delete item function
 async function deleteItem(itemId) {
-    if (!confirm(`Are you sure you want to delete this item?`)) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/items/${itemId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (response.ok) {
-            showNotification('Item deleted successfully!', 'success');
-            await loadItems();
-        } else {
-            const errorData = await response.json();
-            showNotification('Error: ' + (errorData.error || 'Failed to delete item'), 'error');
+    showConfirmation('Are you sure you want to delete this item?', async () => {
+        try {
+            const response = await fetch(`/api/items/${itemId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                showNotification('Item deleted successfully!', 'success');
+                await loadItems();
+            } else {
+                const errorData = await response.json();
+                showNotification('Error: ' + (errorData.error || 'Failed to delete item'), 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting item:', error);
+            showNotification('Error deleting item: ' + error.message, 'error');
         }
-    } catch (error) {
-        console.error('Error deleting item:', error);
-        showNotification('Error deleting item: ' + error.message, 'error');
-    }
+    });
 }
 
 // Open edit modal
@@ -553,25 +579,23 @@ function closeViewOrderModal() {
 
 // Delete sale/order
 async function deleteSale(sellingId) {
-    if (!confirm(`Are you sure you want to delete this order (Order ID: ${sellingId})?`)) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/sales/${sellingId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (response.ok) {
-            showNotification('Order deleted successfully!', 'success');
-            await loadSales();
-        } else {
-            const errorData = await response.json();
-            showNotification('Error: ' + (errorData.error || 'Failed to delete order'), 'error');
+    showConfirmation(`Are you sure you want to delete this order (Order ID: ${sellingId})?`, async () => {
+        try {
+            const response = await fetch(`/api/sales/${sellingId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                showNotification('Order deleted successfully!', 'success');
+                await loadSales();
+            } else {
+                const errorData = await response.json();
+                showNotification('Error: ' + (errorData.error || 'Failed to delete order'), 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showNotification('Error deleting order: ' + error.message, 'error');
         }
-    } catch (error) {
-        console.error('Error deleting order:', error);
-        showNotification('Error deleting order: ' + error.message, 'error');
-    }
+    });
 }
