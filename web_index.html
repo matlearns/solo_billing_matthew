@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solo Billing - Web Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">Solo Billing</h1>
+                <ul class="flex gap-6">
+                    <li><a href="#dashboard" class="text-gray-600 hover:text-blue-600 font-medium">Dashboard</a></li>
+                    <li><a href="#items" class="text-gray-600 hover:text-blue-600 font-medium">Items</a></li>
+                    <li><a href="#sales" class="text-gray-600 hover:text-blue-600 font-medium">Sales</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Total Items</p>
+                    <p class="text-3xl font-bold text-blue-600">0</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Total Sales</p>
+                    <p class="text-3xl font-bold text-green-600">$0.00</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <p class="text-gray-600 text-sm">Recent Orders</p>
+                    <p class="text-3xl font-bold text-purple-600">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Items Management Section -->
+        <section id="items" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Item Management</h2>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                    + Add Item
+                </button>
+            </div>
+
+            <!-- Add Item Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Add New Item</h3>
+                <form class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Item Name</label>
+                        <input type="text" placeholder="Enter item name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Cost Price</label>
+                        <input type="number" placeholder="0.00" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Sell Price</label>
+                        <input type="number" placeholder="0.00" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-medium">
+                            Add Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Items Table -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Item ID</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Item Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cost Price</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Sell Price</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Margin</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No items found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Sales Records Section -->
+        <section id="sales">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-gray-800">Sales Records</h2>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                    + New Order
+                </button>
+            </div>
+
+            <!-- New Order Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Create New Order</h3>
+                <form class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Customer Name</label>
+                        <input type="text" placeholder="Enter customer name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Customer ID</label>
+                        <input type="number" placeholder="Auto-generated" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" disabled>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium">
+                            Create Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sales Table -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Order ID</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Customer Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Items</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Amount</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Discount</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Grand Total</th>
+                            <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">No orders found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2026 Solo Billing. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="web_app.js"></script>
+</body>
+</html>
