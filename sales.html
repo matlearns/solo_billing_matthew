@@ -176,7 +176,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadSales();
             setupItemSelectListener();
-            setupOrderForm();
             
             // Check URL parameters
             const params = new URLSearchParams(window.location.search);
@@ -188,63 +187,6 @@
                 viewOrder(parseInt(viewId));
             }
         });
-
-        // Setup order form
-        function setupOrderForm() {
-            const orderForm = document.getElementById('orderForm');
-            if (orderForm) {
-                orderForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    const customerName = document.getElementById('orderCustomerName').value;
-                    const discount = parseFloat(document.getElementById('discountAmount').value) || 0;
-                    const grandTotal = parseFloat(document.getElementById('grandTotal').textContent.replace('$', '')) || 0;
-                    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '')) || 0;
-                    
-                    if (!customerName) {
-                        showNotification('Please enter customer name', 'warning');
-                        return;
-                    }
-                    
-                    if (orderItems.length === 0) {
-                        showNotification('Please add at least one item to the order', 'warning');
-                        return;
-                    }
-                    
-                    try {
-                        const response = await fetch('/api/orders', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                customer_name: customerName,
-                                items: orderItems,
-                                total_amount: subtotal,
-                                discount: discount,
-                                grand_total: grandTotal
-                            })
-                        });
-                        
-                        const responseData = await response.json();
-                        
-                        if (response.ok) {
-                            showNotification('Order created successfully!', 'success');
-                            orderForm.reset();
-                            orderItems = [];
-                            displayOrderItems();
-                            updateOrderTotals();
-                            document.getElementById('orderFormSection').style.display = 'none';
-                            window.history.replaceState({}, document.title, window.location.pathname);
-                            await loadSales();
-                        } else {
-                            showNotification('Error: ' + (responseData.error || 'Failed to create order'), 'error');
-                        }
-                    } catch (error) {
-                        console.error('Error creating order:', error);
-                        showNotification('Error creating order: ' + error.message, 'error');
-                    }
-                });
-            }
-        }
 
         // Override displaySales for this page
         function displaySales(sales) {
