@@ -1,6 +1,40 @@
 let editingItemId = null;
 let orderItems = [];
 
+// Notification system
+function showNotification(message, type = 'success') {
+    // Create notification container if it doesn't exist
+    let notificationContainer = document.getElementById('notificationContainer');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.id = 'notificationContainer';
+        notificationContainer.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;';
+        document.body.appendChild(notificationContainer);
+    }
+
+    // Determine background color based on type
+    const bgColor = type === 'error' ? 'bg-red-500' : type === 'warning' ? 'bg-yellow-500' : 'bg-green-500';
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `${bgColor} text-white px-8 py-4 rounded-lg shadow-2xl max-w-md text-center font-medium animate-pulse`;
+    notification.textContent = message;
+    
+    notificationContainer.innerHTML = '';
+    notificationContainer.appendChild(notification);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => {
+            if (notificationContainer.contains(notification)) {
+                notificationContainer.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
 // Fetch items from API
 async function loadItems() {
     try {
@@ -78,7 +112,7 @@ function addItemToOrder() {
     const total = parseFloat(document.getElementById('itemTotal').value) || 0;
     
     if (!itemSelect.value) {
-        alert('Please select an item');
+        showNotification('Please select an item', 'warning');
         return;
     }
     
@@ -253,15 +287,15 @@ async function deleteItem(itemId) {
         });
         
         if (response.ok) {
-            alert('Item deleted successfully!');
+            showNotification('Item deleted successfully!', 'success');
             await loadItems();
         } else {
             const errorData = await response.json();
-            alert('Error: ' + (errorData.error || 'Failed to delete item'));
+            showNotification('Error: ' + (errorData.error || 'Failed to delete item'), 'error');
         }
     } catch (error) {
         console.error('Error deleting item:', error);
-        alert('Error deleting item: ' + error.message);
+        showNotification('Error deleting item: ' + error.message, 'error');
     }
 }
 
@@ -290,7 +324,7 @@ function closeEditModal() {
 // Save edited item
 async function saveEditedItem() {
     if (!editingItemId) {
-        alert('No item selected for editing');
+        showNotification('No item selected for editing', 'warning');
         return;
     }
     
@@ -299,7 +333,7 @@ async function saveEditedItem() {
     const sellPrice = document.getElementById('editSellPrice').value;
     
     if (!itemName || !costPrice || !sellPrice) {
-        alert('Please fill in all fields');
+        showNotification('Please fill in all fields', 'warning');
         return;
     }
     
@@ -317,15 +351,15 @@ async function saveEditedItem() {
         const responseData = await response.json();
         
         if (response.ok) {
-            alert('Item updated successfully!');
+            showNotification('Item updated successfully!', 'success');
             closeEditModal();
             await loadItems();
         } else {
-            alert('Error: ' + (responseData.error || 'Failed to update item'));
+            showNotification('Error: ' + (responseData.error || 'Failed to update item'), 'error');
         }
     } catch (error) {
         console.error('Error updating item:', error);
-        alert('Error updating item: ' + error.message);
+        showNotification('Error updating item: ' + error.message, 'error');
     }
 }
 
@@ -361,15 +395,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const responseData = await response.json();
                 
                 if (response.ok) {
-                    alert('Item added successfully!');
+                    showNotification('Item added successfully!', 'success');
                     addItemForm.reset();
                     await loadItems();
                 } else {
-                    alert('Error: ' + (responseData.error || 'Failed to add item'));
+                    showNotification('Error: ' + (responseData.error || 'Failed to add item'), 'error');
                 }
             } catch (error) {
                 console.error('Error adding item:', error);
-                alert('Error adding item: ' + error.message);
+                showNotification('Error adding item: ' + error.message, 'error');
             }
         });
     }
@@ -386,12 +420,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('$', '')) || 0;
             
             if (!customerName) {
-                alert('Please enter customer name');
+                showNotification('Please enter customer name', 'warning');
                 return;
             }
             
             if (orderItems.length === 0) {
-                alert('Please add at least one item to the order');
+                showNotification('Please add at least one item to the order', 'warning');
                 return;
             }
             
@@ -411,18 +445,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 const responseData = await response.json();
                 
                 if (response.ok) {
-                    alert('Order created successfully!');
+                    showNotification('Order created successfully!', 'success');
                     orderForm.reset();
                     orderItems = [];
                     displayOrderItems();
                     updateOrderTotals();
                     await loadSales();
                 } else {
-                    alert('Error: ' + (responseData.error || 'Failed to create order'));
+                    showNotification('Error: ' + (responseData.error || 'Failed to create order'), 'error');
                 }
             } catch (error) {
                 console.error('Error creating order:', error);
-                alert('Error creating order: ' + error.message);
+                showNotification('Error creating order: ' + error.message, 'error');
             }
         });
     }
@@ -444,7 +478,7 @@ async function viewOrder(sellingId) {
         const response = await fetch(`/api/sales/${sellingId}/details`);
         
         if (!response.ok) {
-            alert('Failed to load order details');
+            showNotification('Failed to load order details', 'error');
             return;
         }
         
@@ -508,7 +542,7 @@ async function viewOrder(sellingId) {
         document.getElementById('viewOrderModal').style.display = 'flex';
     } catch (error) {
         console.error('Error fetching order details:', error);
-        alert('Error loading order details: ' + error.message);
+        showNotification('Error loading order details: ' + error.message, 'error');
     }
 }
 
@@ -530,14 +564,14 @@ async function deleteSale(sellingId) {
         });
         
         if (response.ok) {
-            alert('Order deleted successfully!');
+            showNotification('Order deleted successfully!', 'success');
             await loadSales();
         } else {
             const errorData = await response.json();
-            alert('Error: ' + (errorData.error || 'Failed to delete order'));
+            showNotification('Error: ' + (errorData.error || 'Failed to delete order'), 'error');
         }
     } catch (error) {
         console.error('Error deleting order:', error);
-        alert('Error deleting order: ' + error.message);
+        showNotification('Error deleting order: ' + error.message, 'error');
     }
 }
