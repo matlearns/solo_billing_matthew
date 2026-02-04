@@ -304,6 +304,7 @@ function displaySales(sales) {
         <tr class="border-b hover:bg-gray-50">
             <td class="px-6 py-4 text-sm text-gray-700">${sale.selling_id}</td>
             <td class="px-6 py-4 text-sm text-gray-700">${sale.customer_name}</td>
+            <td class="px-6 py-4 text-sm text-gray-700">${sale.created_at || ''}</td>
             <td class="px-6 py-4 text-sm text-gray-700">${sale.items_count || 0}</td>
             <td class="px-6 py-4 text-sm text-gray-700">$${parseFloat(sale.total_amount).toFixed(2)}</td>
             <td class="px-6 py-4 text-sm text-gray-700">$${parseFloat(sale.discount).toFixed(2)}</td>

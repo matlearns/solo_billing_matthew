@@ -43,9 +43,21 @@ def init_db():
                 customer_name VARCHAR(255) NOT NULL,
                 total_amount DECIMAL(10, 2) NOT NULL,
                 discount DECIMAL(10, 2) DEFAULT 0,
-                grand_total DECIMAL(10, 2) NOT NULL
+                grand_total DECIMAL(10, 2) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+
+        # Ensure existing DB has created_at column (for upgrades)
+        try:
+            cursor.execute("PRAGMA table_info(selling_record)")
+            cols = cursor.fetchall()
+            col_names = [c[1] for c in cols]
+            if 'created_at' not in col_names:
+                cursor.execute("ALTER TABLE selling_record ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+        except Exception:
+            # If anything goes wrong here, ignore - it's not critical for older DBs
+            pass
         
         # Create selling_details table
         cursor.execute('''
