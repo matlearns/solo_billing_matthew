@@ -614,3 +614,204 @@ async function deleteSale(sellingId) {
         }
     });
 }
+
+// Print bill for order
+async function printBill(sellingId) {
+    try {
+        // Fetch order details
+        const response = await fetch(`/api/sales/${sellingId}/details`);
+        if (!response.ok) {
+            showNotification('Error loading order details', 'error');
+            return;
+        }
+        
+        const data = await response.json();
+        const order = data.order;
+        const items = data.items;
+        
+        // Create print window
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Bill - Order ${order.selling_id}</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 40px;
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+                    .bill-header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        border-bottom: 2px solid #333;
+                        padding-bottom: 15px;
+                    }
+                    .bill-header h1 {
+                        margin: 0;
+                        font-size: 28px;
+                        color: #333;
+                    }
+                    .bill-header p {
+                        margin: 5px 0;
+                        color: #666;
+                    }
+                    .order-info {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                        margin-bottom: 30px;
+                    }
+                    .info-section {
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                    }
+                    .info-section h3 {
+                        margin: 0 0 10px 0;
+                        font-size: 14px;
+                        color: #333;
+                        text-transform: uppercase;
+                    }
+                    .info-section p {
+                        margin: 5px 0;
+                        font-size: 14px;
+                        color: #555;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 30px;
+                    }
+                    thead {
+                        background-color: #f0f0f0;
+                    }
+                    th {
+                        padding: 10px;
+                        text-align: left;
+                        font-weight: bold;
+                        border-bottom: 2px solid #333;
+                        font-size: 14px;
+                    }
+                    td {
+                        padding: 10px;
+                        border-bottom: 1px solid #ddd;
+                        font-size: 14px;
+                    }
+                    .text-right {
+                        text-align: right;
+                    }
+                    .totals {
+                        display: flex;
+                        justify-content: flex-end;
+                        margin-bottom: 30px;
+                    }
+                    .totals-section {
+                        width: 300px;
+                    }
+                    .total-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 8px 0;
+                        border-bottom: 1px solid #ddd;
+                        font-size: 14px;
+                    }
+                    .total-row.grand-total {
+                        border-top: 2px solid #333;
+                        border-bottom: 2px solid #333;
+                        font-weight: bold;
+                        font-size: 16px;
+                        padding: 12px 0;
+                        margin-top: 10px;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 30px;
+                        padding-top: 20px;
+                        border-top: 1px solid #ddd;
+                        font-size: 12px;
+                        color: #666;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="bill-header">
+                    <h1>BILL</h1>
+                    <p>Order #${order.selling_id}</p>
+                </div>
+                
+                <div class="order-info">
+                    <div class="info-section">
+                        <h3>Customer Information</h3>
+                        <p><strong>Name:</strong> ${order.customer_name}</p>
+                        <p><strong>Order ID:</strong> ${order.selling_id}</p>
+                    </div>
+                    <div class="info-section">
+                        <h3>Order Details</h3>
+                        <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+                        <p><strong>Items:</strong> ${items.length}</p>
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th class="text-right">Price</th>
+                            <th class="text-right">Qty</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr>
+                                <td>${item.item_name || 'N/A'}</td>
+                                <td class="text-right">$${parseFloat(item.sell_price || 0).toFixed(2)}</td>
+                                <td class="text-right">${item.quantity}</td>
+                                <td class="text-right">$${(parseFloat(item.sell_price || 0) * item.quantity).toFixed(2)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="totals">
+                    <div class="totals-section">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>$${parseFloat(order.total_amount).toFixed(2)}</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Discount:</span>
+                            <span>-$${parseFloat(order.discount).toFixed(2)}</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span>Grand Total:</span>
+                            <span>$${parseFloat(order.grand_total).toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer">
+                    <p>Thank you for your purchase!</p>
+                    <p>&copy; 2026 Solo Billing. All rights reserved.</p>
+                </div>
+                
+                <script>
+                    window.print();
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    } catch (error) {
+        console.error('Error printing bill:', error);
+        showNotification('Error printing bill: ' + error.message, 'error');
+    }
+}

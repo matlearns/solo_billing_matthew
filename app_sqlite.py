@@ -3,6 +3,7 @@ from flask_cors import CORS
 import sqlite3
 import os
 import sys
+from datetime import datetime
 
 app = Flask(__name__, template_folder='.', static_folder='.')
 CORS(app)
@@ -200,7 +201,8 @@ def get_sales():
         
         cur = conn.cursor()
         cur.execute('''
-            SELECT sr.*, COUNT(sd.selling_detail_id) as items_count
+            SELECT sr.selling_id, sr.customer_id, sr.customer_name, sr.total_amount, sr.discount, sr.grand_total, sr.created_at,
+                   COUNT(sd.selling_detail_id) as items_count
             FROM selling_record sr
             LEFT JOIN selling_details sd ON sr.selling_id = sd.selling_id
             GROUP BY sr.selling_id
@@ -226,8 +228,8 @@ def add_sale():
         
         cur = conn.cursor()
         cur.execute(
-            'INSERT INTO selling_record (customer_id, customer_name, total_amount, discount, grand_total) VALUES (?, ?, ?, ?, ?)',
-            (1, data['customer_name'], 0, 0, 0)
+            "INSERT INTO selling_record (customer_id, customer_name, total_amount, discount, grand_total, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (1, data['customer_name'], 0, 0, 0, datetime.now())
         )
         conn.commit()
         selling_id = cur.lastrowid
@@ -256,8 +258,8 @@ def create_order():
         
         # Create selling record
         cur.execute(
-            'INSERT INTO selling_record (customer_id, customer_name, total_amount, discount, grand_total) VALUES (?, ?, ?, ?, ?)',
-            (1, data['customer_name'], data['total_amount'], data['discount'], data['grand_total'])
+            "INSERT INTO selling_record (customer_id, customer_name, total_amount, discount, grand_total, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+            (1, data['customer_name'], data['total_amount'], data['discount'], data['grand_total'], datetime.now())
         )
         conn.commit()
         selling_id = cur.lastrowid
